@@ -36,8 +36,7 @@ public function login(Request $request)
         [
             'email_user.required' => 'Email wajib diisi.',
             'email_user.email' => 'Format email tidak valid.',
-            'password_user.required' => 'Password wajib diisi.',
-            'password_user.min' => 'Password minimal :min karakter.'
+            'password_user.required' => 'Password wajib diisi.'
         ]
     );
 
@@ -80,6 +79,16 @@ $token = $user->createToken('auth_token')->plainTextToken;
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
+        
+         // Hapus session user
+        Auth::guard('web')->logout();
+
+        // Hapus session di server
+        $request->session()->invalidate();
+
+        // Regenerasi CSRF token biar lebih aman
+        $request->session()->regenerateToken();
+
         return response()->json(['message' => 'Logged out']);
     }
 }

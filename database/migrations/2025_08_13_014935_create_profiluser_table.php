@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('profiluser', function (Blueprint $table) {
             $table->id('idprofiluser');
-            $table->integer('iduser')->unique();
+            $table->unsignedBigInteger('iduser')->unique();
+            $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
             $table->string('foto_profil')->nullable();
             $table->string('alamatlengkap')->nullable();
             $table->string('no_telp')->nullable();
+            $table->string('kelurahan')->nullable();
             $table->string('kecamatan')->nullable();
             $table->string('kabupaten')->nullable();
             $table->string('provinsi')->nullable();
-            $table->integer('kode_pos')->nullable();
+            $table->string('kode_pos')->nullable();
             $table->string('nama_anak')->nullable();
-            $table->string('usia_anak')->nullable();
+            $table->integer('usia_anak')->nullable();
             $table->timestamps();
         });
     }

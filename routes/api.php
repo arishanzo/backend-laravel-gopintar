@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\User\UserProfileController;
+use App\Models\ProfilUser;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -48,4 +50,9 @@ Route::get('/hello', function () {
 });
 
 
+Route::middleware(['auth:sanctum','throttle:200,1'])->group(function () {
+    Route::post('/profile', [UserProfileController::class, 'store']);
+    Route::post('/profileedit/{idprofiluser}', [UserProfileController::class, 'update']);
+    Route::get('/profile/{iduser}', [UserProfileController::class, 'getByID']);
+});
 
