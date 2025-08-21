@@ -12,7 +12,8 @@ use App\Models\ProfilUser;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image; 
+use Intervention\Image\Facades\Image;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class UserProfileController extends Controller
 {
@@ -50,20 +51,44 @@ class UserProfileController extends Controller
 
         $data = $request->validated();
         $data['iduser'] = $user->iduser;
+
+        
+         $cekprofil = ProfilUser::where('iduser', $user->iduser)->first();
+
         
         if ($request->hasFile('foto_profil')) {
-            $file = $request->file('foto_profil');
-            $binary = file_get_contents($file->getRealPath());
-            $image = Image::make($binary)->toWebp(85);
-            $encoded = (string) $image->encode();
-            $disk = env('PHOTO_PRIVATE_DISK', 'private');
-            $filename = Str::uuid()->toString().'.webp';
-            $path = 'photos/'.date('Y/m/d').'/'.$filename;
-            $data['foto_profil'] = $path;
-            Storage::disk($disk)->put($path, $encoded, 'private');
-        }
 
+              if ($cekprofil->foto_profil && Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->exists($cekprofil->foto_profil)) {
+            Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->delete($cekprofil->foto_profil);
+           }
+       
+
+            $file = $request->file('foto_profil');
+
+           $image = Image::make($file)->encode('webp', 80);
+
+            $encoded = (string) $image->encode();
+
+            $disk = env('PHOTO_PRIVATE_DISK', 'private');
+            
+            $filename = Str::uuid()->toString().'.webp';
+
+            $path = 'photos/'.date('Y/m/d').'/'.$filename;
+
+            $data['foto_profil'] = $path;
+            
+            Storage::disk($disk)->put($path, $encoded, 'private');
+        } else {
+        unset($data['foto_profil']); // jangan overwrite kolom lama kalau tidak ada upload
+       }
+
+       $cekprofil = ProfilUser::where('iduser', $user->iduser)->first();
+
+       if($cekprofil){
+        $cekprofil->update($data);
+       } else {
         ProfilUser::create($data);
+       }
 
         return response()->json([
             'message' => 'Profile Berhasil Disimpan',
@@ -109,13 +134,14 @@ class UserProfileController extends Controller
      Storage::disk($disk)->put($path, $encoded, ['visibility' => 'private']);
 
         
+     } else {
+        unset($data['foto_profil']);
     }
 
     $profil->update($data);
 
     return response()->json([
         'message' => 'Profile berhasil diperbarui',
-        'foto_profil' => $data['foto_profil'] ?? null,
     ], 200);
 
     }

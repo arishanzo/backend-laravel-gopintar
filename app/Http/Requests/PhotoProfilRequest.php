@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\File as FileRule;
 
 class PhotoProfilRequest extends FormRequest
 {
@@ -23,35 +22,29 @@ class PhotoProfilRequest extends FormRequest
     public function rules(): array
     {
         return [
-             'foto_profil' => [
-                'nullable',
-                'file',
-                FileRule::image()
-                    ->types(['jpg','jpeg','png','webp'])
-                    ->max(5 * 1024) // 5 MB
-                    ->dimensions(fn($rule) => $rule->maxWidth(4000)->maxHeight(4000)),
-                  ],
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048|dimensions:max_width=1000,max_height=1000',
 
-            'alamatlengkap' => 'required|string|max:255',
-            'no_telp' => 'required|string|max:15',
-            'kelurahan' => 'required|string|max:255',
-            'kecamatan' => 'required|string|max:255',
-            'kabupaten' => 'required|string|max:255',
-            'provinsi' => 'required|string|max:255',
-            'kode_pos' => 'required|string|max:10',
-            'nama_anak' => 'required|string|max:255',
-            'usia_anak' => 'required|integer|min:1|max:100',
+           'alamatlengkap' => 'nullable|string|max:255',
+        'no_telp' => 'nullable|string|max:15',
+        'kelurahan' => 'nullable|string|max:255',
+        'kecamatan' => 'nullable|string|max:255',
+        'kabupaten' => 'nullable|string|max:255',
+        'provinsi' => 'nullable|string|max:255',
+        'kode_pos' => 'nullable|string|max:10',
+        'nama_anak' => 'nullable|string|max:255',
+        'usia_anak' => 'nullable|integer|min:1|max:100',
         ];
     }
 
      public function messages(): array
     {
         return [
-           'foto_profil.file' => 'File harus berupa gambar.',
+          'foto_profil.image' => 'File harus berupa gambar.',
+            'foto_profil.dimensions' => 'File harus 1000 x 1000',
         'foto_profil.mimes' => 'File harus berupa gambar dengan format jpg, jpeg, png, atau webp.',
         'foto_profil.max' => 'Ukuran file tidak boleh melebihi 5 MB.',
         'no_telp.required' => 'Nomor telepon harus diisi.',
-        'no_telp.max' => 'Nomor telepon tidak boleh melebihi 12 digit.',
+        'no_telp.digits_between' => 'Nomor telepon harus antara 8 sampai 12 digit.',
         'provinsi.required' => 'Provinsi harus diisi.',
         'provinsi.max' => 'Provinsi tidak boleh melebihi 255 karakter.',
         'kabupaten.required' => 'Kabupaten harus diisi.',
@@ -61,13 +54,16 @@ class PhotoProfilRequest extends FormRequest
         'kelurahan.required' => 'Kelurahan harus diisi.',
         'kelurahan.max' => 'Kelurahan tidak boleh melebihi 255 karakter.',
         'kode_pos.required' => 'Kode pos harus diisi.',
-        'kode_pos.max' => 'Kode pos tidak boleh melebihi 12 digit.',
+        'kode_pos.max' => 'Kode pos tidak boleh melebihi 10 karakter.',
         'nama_anak.required' => 'Nama anak harus diisi.',
         'nama_anak.max' => 'Nama anak tidak boleh melebihi 255 karakter.',
         'usia_anak.required' => 'Usia anak harus diisi.',
-        'usia_anak.max' => 'Usia anak tidak boleh melebihi 255 karakter.',
+        'usia_anak.max' => 'Usia anak tidak boleh lebih dari 100 tahun.',
+        'usia_anak.min' => 'Usia anak minimal 1 tahun.',
+        'usia_anak.integer' => 'Usia anak harus berupa angka.',
         'alamatlengkap.required' => 'Alamat lengkap harus diisi.',
         'alamatlengkap.max' => 'Alamat lengkap tidak boleh melebihi 255 karakter.',
+ 
     
         ];
     }

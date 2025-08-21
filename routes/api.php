@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\User\UserProfileController;
 use App\Models\ProfilUser;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirectToGoogle']);
 Route::post('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-Route::middleware('auth:sanctum')->get('/user', [AuthProsesController::class, 'user']);
+Route::middleware(['auth:sanctum', 'throttle:1000,1'])->get('/user', [AuthProsesController::class, 'user']);
 
 
 Route::get('/sanctum/csrf-cookie', function () {
@@ -50,9 +51,23 @@ Route::get('/hello', function () {
 });
 
 
-Route::middleware(['auth:sanctum','throttle:200,1'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [UserProfileController::class, 'store']);
     Route::post('/profileedit/{idprofiluser}', [UserProfileController::class, 'update']);
     Route::get('/profile/{iduser}', [UserProfileController::class, 'getByID']);
+
+    Route::get('/photos/{path}', function ($path) {
+    $disk = env('PHOTO_PRIVATE_DISK', 'private');
+    $decodedPath = urldecode($path);
+
+    if (!Storage::disk($disk)->exists($decodedPath)) {
+        abort(404);
+    }
+
+    $file = Storage::disk($disk)->get($decodedPath);
+    $type = Storage::disk($disk)->mimeType($decodedPath) ?? 'image/webp';
+
+    return response($file, 200)->header('Content-Type', $type);
+})->where('path', '.*');
 });
 
