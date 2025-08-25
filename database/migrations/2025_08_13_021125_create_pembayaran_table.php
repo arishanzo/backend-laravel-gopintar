@@ -13,13 +13,26 @@ return new class extends Migration
     {
         Schema::create('pembayaran', function (Blueprint $table) {
             $table->id('idpembayaran');
-             $table->integer('iduser')->unique();
+                $table->unsignedBigInteger('iduser')->unique();
+            $table->string('order_id')->unique();
+            $table->string('transaction_id');
             $table->string('namapaket')->nullable();
-            $table->timestamp('tglberakhirpembayaran')->nullable();
-            $table->timestamp('metodepembayaran')->nullable();
-            $table->integer('jumlahpembayaran')->nullable();
-            $table->enum('statuspembayaran', ['pending', 'berhasil', 'gagal'])->default('pending');
+            $table->string('metodepembayaran')->nullable(); // bank_transfer, qris, gopay, dll
+            $table->decimal('jumlahpembayaran', 12, 2);
+            $table->string('statuspembayaran')->default('pending');
+            $table->dateTime('tglberakhirpembayaran')->nullable();
+
+            // detail tambahan sesuai metode
+            $table->string('va_number')->nullable();       // bank transfer
+            $table->string('bank')->nullable();            // bank bca, bri, dll
+            $table->text('qris_url')->nullable();          // url QRIS
+            $table->string('payment_code')->nullable();    // kode cstore
+            $table->text('redirect_url')->nullable();      // credit_card / ewallet
+
             $table->timestamps();
+
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

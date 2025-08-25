@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('bookingprivate', function (Blueprint $table) {
             $table->id('idbookingprivate');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+            $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->string('jamsesi')->nullable();
             $table->enum('statusbookingprivate', ['kelas selesai', 'kelas dimulai', 'kelas belum selesai'])->default('kelas belum selesai');
             $table->timestamps();
+
+            
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
+             
         });
     }
 

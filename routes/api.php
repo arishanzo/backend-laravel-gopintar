@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Pembayaran\PaymentController;
 use App\Http\Controllers\User\UserProfileController;
 use App\Models\ProfilUser;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +42,9 @@ Route::post('/logout', function (Request $request) {
 
 
 Route::post('/daftar', [AuthProsesController::class, 'register']);
-Route::post('/login', [AuthProsesController::class, 'login']);
+
+
+Route::post('/login', [AuthProsesController::class, 'login'])->name('login');
 
 Route::post('/logout', [AuthProsesController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -68,6 +71,17 @@ Route::middleware('auth:sanctum')->group(function () {
     $type = Storage::disk($disk)->mimeType($decodedPath) ?? 'image/webp';
 
     return response($file, 200)->header('Content-Type', $type);
-})->where('path', '.*');
+    })->where('path', '.*');
+
+    
+  Route::put('/profile/ubahpassword', [UserProfileController::class, 'ubahpassword']);
+
+  Route::post('/midtrans/charge', [PaymentController::class, 'charge']);
+  Route::post('/midtrans/notification', [PaymentController::class, 'notification']);
+
+  // routes/api.php
+  Route::get('/midtrans/{iduser}', [PaymentController::class, 'getTransaction']);
+
+
 });
 

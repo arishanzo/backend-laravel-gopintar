@@ -13,14 +13,18 @@ return new class extends Migration
     {
         Schema::create('hasilrekapnilai', function (Blueprint $table) {
             $table->id('idhasilrekapnilai');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+             $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->integer('idtugasbelajar')->unique();
             $table->integer('toalnilai')->nullable();
             $table->enum('statusnilai', ['selesai', 'batal', 'pending'])->default('pending');
             $table->timestamp('tglpenilaian')->nullable();
             $table->text('catatan')->nullable();
             $table->timestamps();
+
+            
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

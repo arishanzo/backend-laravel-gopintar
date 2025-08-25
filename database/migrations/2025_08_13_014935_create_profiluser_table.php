@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('profiluser', function (Blueprint $table) {
             $table->id('idprofiluser');
             $table->unsignedBigInteger('iduser')->unique();
-            $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
             $table->string('foto_profil')->nullable();
             $table->string('alamatlengkap')->nullable();
             $table->string('no_telp')->nullable();
@@ -26,6 +25,10 @@ return new class extends Migration
             $table->string('nama_anak')->nullable();
             $table->integer('usia_anak')->nullable();
             $table->timestamps();
+
+            
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

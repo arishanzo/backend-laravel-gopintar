@@ -44,6 +44,7 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
+        
     ],
 
     /*
@@ -69,10 +70,6 @@ return [
             'model' => App\Models\UserLogin::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

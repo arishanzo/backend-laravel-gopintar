@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('bookingdate', function (Blueprint $table) {
             $table->id('idbookingdate');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+           $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->integer('idbookingprivate')->unique();
             $table->date('tanggal');
             $table->enum('statusngajar', ['selesai', 'batal', 'pending'])->default('pending');
             $table->timestamps();
+
+            
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

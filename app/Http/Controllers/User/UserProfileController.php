@@ -9,7 +9,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PhotoProfilRequest;
 use App\Models\ProfilUser;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -58,7 +60,7 @@ class UserProfileController extends Controller
         
         if ($request->hasFile('foto_profil')) {
 
-              if ($cekprofil->foto_profil && Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->exists($cekprofil->foto_profil)) {
+              if ($cekprofil && $cekprofil->foto_profil && Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->exists($cekprofil->foto_profil)) {
             Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->delete($cekprofil->foto_profil);
            }
        
@@ -96,54 +98,30 @@ class UserProfileController extends Controller
 
     }   
 
-    public function update (PhotoProfilRequest $request, $idprofiluser) {
+    public function ubahpassword(Request $request) {
+        
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:6',
+            'password_confirmation' => 'required|string|same:password',
+        ],
+         [
+             'current_password.required' => 'Password Harus Diisi',
+             'password.required' => 'Password Harus Diisi',
+             'password.min' => 'Password Harus minimal 6 karakter',
+            'password_confirmation.same' => 'Password Berbeda Harus Sama',
+        ]
+    );
 
- $user = $request->user();
-    if (!$user) {
-        return response()->json([
-            'message' => 'User tidak terautentikasi'
-        ], 401);
-    }
-
-    $data = $request->validated();
-    $data['iduser'] = $user->iduser;
-
-    $profil = ProfilUser::findOrFail($idprofiluser);
-
-    if ($request->hasFile('foto_profil')) {
-
-        // Hapus foto lama kalau ada
-      
-        if ($profil->foto_profil && Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->exists($profil->foto_profil)) {
-            Storage::disk(env('PHOTO_PRIVATE_DISK', 'private'))->delete($profil->foto_profil);
+        $user = $request->user();
+         
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Password lama salah'], 400);
         }
-       
-        $file = $request->file('foto_profil');
-        $binary = file_get_contents($file->getRealPath());
-
-        $image = Image::make($binary)->encode('webp', 85);
-        $encoded = (string) $image;
-
-
-        $disk = env('PHOTO_PRIVATE_DISK', 'private');
-        $filename = Str::uuid()->toString() . '.webp';
-        $path = 'photos/' . date('Y/m/d') . '/' . $filename;
         
-
-        $data['foto_profil'] = $path;
-     Storage::disk($disk)->put($path, $encoded, ['visibility' => 'private']);
-
+        $user->update(['password' => Hash::make($request->password)]);
         
-     } else {
-        unset($data['foto_profil']);
-    }
-
-    $profil->update($data);
-
-    return response()->json([
-        'message' => 'Profile berhasil diperbarui',
-    ], 200);
-
+        return response()->json(['message' => 'Password berhasil diubah'], 200);
     }
 
     public function destroy () {

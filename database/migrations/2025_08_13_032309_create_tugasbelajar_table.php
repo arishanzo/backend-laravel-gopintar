@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('tugasbelajar', function (Blueprint $table) {
             $table->id('idtugasbelajar');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+            $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->string('namatugas')->nullable();
             $table->text('deskripsitugas')->nullable();
             $table->date('tanggaltugas')->nullable();
@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('catatantugas')->nullable();
             $table->timestamp('tglcatatantugas')->nullable();
             $table->timestamps();
+
+            
+
+             $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

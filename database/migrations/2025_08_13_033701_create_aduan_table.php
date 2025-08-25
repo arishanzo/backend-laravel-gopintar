@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('aduan', function (Blueprint $table) {
             $table->id('idaduan');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+            $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->string('juduladuan')->nullable();
             $table->text('deskripsiaduan')->nullable();
             $table->enum('statusaduan', ['ditanggapi', 'belum ditanggapi', 'ditolak'])->default('belum ditanggapi');
@@ -22,6 +22,10 @@ return new class extends Migration
             $table->text('tanggapan')->nullable();
             $table->timestamp('tgltanggapan')->nullable();
             $table->timestamps();
+
+            
+
+              $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

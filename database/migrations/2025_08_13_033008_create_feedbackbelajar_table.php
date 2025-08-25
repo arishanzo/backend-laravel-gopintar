@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('feedbackbelajar', function (Blueprint $table) {
             $table->id('idfeedbackbelajar');
-             $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+             $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->integer('idbookingprivate')->unique();
             $table->string('feedbackbelajar')->nullable();
             $table->integer('ratingbelajar')->nullable();
             $table->timestamps();
+
+            
+
+              $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 

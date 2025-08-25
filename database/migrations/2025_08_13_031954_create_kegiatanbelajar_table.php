@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('kegiatanbelajar', function (Blueprint $table) {
             $table->id('idkegiatanbelajar');
-            $table->integer('iduser')->unique();
-            $table->integer('idguru')->unique();
+            $table->unsignedBigInteger('iduser')->unique();
+            $table->unsignedBigInteger('idguru')->unique();
             $table->string('fotokegiatan')->nullable();
             $table->string('videokegiatan')->nullable();
             $table->string('linkmateri')->nullable();
@@ -22,6 +22,10 @@ return new class extends Migration
             $table->text('deskripsikegiatan')->nullable();
             $table->timestamp('tglkegiatan')->nullable();
             $table->timestamps();
+
+            
+
+              $table->foreign('iduser')->references('iduser')->on('userlogin')->onDelete('cascade');
         });
     }
 
